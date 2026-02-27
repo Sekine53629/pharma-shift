@@ -13,7 +13,7 @@
 | Database    | PostgreSQL (SQLite for dev)                 |
 | Async/Queue | Celery + Redis                              |
 | Hosting     | Heroku                                      |
-| Frontend    | React 18 (not yet implemented)              |
+| Frontend    | React 18 + TypeScript + React Router        |
 
 ## Repository Structure
 
@@ -34,7 +34,14 @@ pharma-shift/
 │       ├── leave/       # LeaveRequest, mandatory PTO alerts
 │       ├── analytics/   # PrescriptionRecord, PrescriptionForecast
 │       └── notifications/ # Zoom Chat API, NotificationLog
-├── frontend/            # React (placeholder)
+├── frontend/
+│   └── src/
+│       ├── api/             # Axios client, endpoint functions
+│       ├── components/      # Layout (Sidebar, AppLayout), common (DataTable, StatusBadge)
+│       ├── contexts/        # AuthContext (JWT login/logout, role checks)
+│       ├── hooks/           # useApi generic data-fetching hook
+│       ├── pages/           # auth, dashboard, stores, staff, shifts, assignments, hr, leave
+│       └── types/           # TypeScript interfaces matching DRF serializers
 └── docs/
 ```
 
@@ -61,7 +68,28 @@ python manage.py makemigrations <app_name>
 
 # Create superuser
 python manage.py createsuperuser
+
+# Seed 62 stores
+python manage.py seed_stores
+
+# Frontend (from frontend/)
+cd ../frontend
+npm install
+npm start          # Dev server on :3000
+npm run build      # Production build
 ```
+
+## Celery Periodic Tasks
+
+Configured in `config/celery.py` with beat schedule:
+
+| Task                         | Schedule     | Description                               |
+|------------------------------|--------------|-------------------------------------------|
+| check_paid_leave_alerts      | Daily 08:00  | Check all staff for mandatory PTO compliance |
+| check_leave_request_deadline | Daily 09:00  | Remind stores 3 days before leave deadline |
+| alert_unfilled_slots         | Daily 10:00  | Alert SVs about unfilled P1/P2 slots      |
+
+Run worker + beat: `celery -A config worker --beat --loglevel=info`
 
 ## Key Design Decisions
 
@@ -255,3 +283,5 @@ Run: `python manage.py test apps`
 - **Working directory**: All Django commands from `backend/`
 - **Business logic**: Complex logic in `services.py`, validation in `validators.py`, models stay lean
 - **Permissions**: Always use permission classes from `apps/accounts/permissions.py`
+- **Frontend**: TypeScript strict mode; inline styles (no CSS framework); API calls through `api/endpoints.ts`
+- **Celery tasks**: Defined in each app's `tasks.py`, scheduled via `config/celery.py` beat config
