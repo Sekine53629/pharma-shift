@@ -1,0 +1,2 @@
+web: gunicorn config.wsgi --chdir backend
+worker: celery -A config worker --loglevel=info
