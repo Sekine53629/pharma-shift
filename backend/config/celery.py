@@ -24,4 +24,16 @@ app.conf.beat_schedule = {
         "task": "apps.assignments.tasks.alert_unfilled_slots",
         "schedule": crontab(hour=10, minute=0),  # Every day at 10:00 AM JST
     },
+    "scrape-musubi-prescriptions-daily": {
+        "task": "apps.analytics.tasks.scrape_musubi_prescriptions",
+        "schedule": crontab(hour=6, minute=0),  # Every day at 6:00 AM JST
+    },
+    "generate-prescription-forecasts-weekly": {
+        "task": "apps.analytics.tasks.generate_prescription_forecasts",
+        "schedule": crontab(hour=7, minute=0, day_of_week=1),  # Monday 7:00 AM JST
+    },
+    "check-evaluator-bias-daily": {
+        "task": "apps.hr_system.tasks.check_all_evaluator_bias",
+        "schedule": crontab(hour=11, minute=0),  # Every day at 11:00 AM JST
+    },
 }
