@@ -36,4 +36,12 @@ app.conf.beat_schedule = {
         "task": "apps.hr_system.tasks.check_all_evaluator_bias",
         "schedule": crontab(hour=11, minute=0),  # Every day at 11:00 AM JST
     },
+    "fetch-idwr-weekly": {
+        "task": "apps.analytics.tasks.fetch_idwr_weekly",
+        "schedule": crontab(hour=5, minute=0, day_of_week=2),  # Tuesday 5:00 AM JST
+    },
+    "fetch-weather-daily": {
+        "task": "apps.analytics.tasks.fetch_weather_daily",
+        "schedule": crontab(hour=5, minute=30),  # Every day at 5:30 AM JST
+    },
 }
