@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
@@ -60,10 +61,19 @@ class HrEvaluation(models.Model):
             f"{self.score} ({self.period_start}〜{self.period_end})"
         )
 
+    def clean(self):
+        super().clean()
+        if self.evaluation_type == "self":
+            if self.score < Decimal("-0.5") or self.score > Decimal("0.5"):
+                raise ValidationError(
+                    {"score": "自己評価は-0.5〜+0.5の範囲です"}
+                )
+
     def save(self, *args, **kwargs):
         # UPDATE禁止：既存レコードのsave（pkがある場合）はエラー
         if self.pk:
             raise ValueError("HR評価レコードは更新できません（INSERT onlyポリシー）")
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

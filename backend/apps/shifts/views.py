@@ -28,6 +28,17 @@ class ShiftViewSet(viewsets.ModelViewSet):
     search_fields = ["staff__name", "store__name"]
     ordering_fields = ["date", "staff__name"]
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.has_any_role("admin", "supervisor"):
+            return qs
+        if user.has_role("store_manager") and hasattr(user, "staff_profile"):
+            return qs.filter(store=user.staff_profile.store)
+        if user.has_role("rounder") and hasattr(user, "staff_profile"):
+            return qs.filter(staff=user.staff_profile)
+        return qs.none()
+
     @action(detail=False, methods=["post"])
     def load_rates(self, request):
         """店舗の日別負荷率を算出"""

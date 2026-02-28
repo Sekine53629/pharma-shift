@@ -29,3 +29,11 @@ class NotificationLog(models.Model):
 
     def __str__(self):
         return f"[{self.trigger}] → {self.recipient_zoom_account} ({self.created_at})"
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValueError("通知ログは更新できません（INSERT onlyポリシー）")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValueError("通知ログは削除できません（INSERT onlyポリシー）")
