@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "command": "bash .claude/hooks/pre-compact.sh"
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "",
+        "command": "bash .claude/hooks/post-compact.sh"
+      }
+    ]
+  }
+}

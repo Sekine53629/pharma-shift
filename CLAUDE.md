@@ -285,3 +285,49 @@ Run: `python manage.py test apps`
 - **Permissions**: Always use permission classes from `apps/accounts/permissions.py`
 - **Frontend**: TypeScript strict mode; inline styles (no CSS framework); API calls through `api/endpoints.ts`
 - **Celery tasks**: Defined in each app's `tasks.py`, scheduled via `config/celery.py` beat config
+
+## Context Preservation Rules
+
+### Compaction Protocol
+- Monitor context usage. When approaching 65-70%, trigger manual `/compact` BEFORE quality degrades.
+- When compacting (manual or auto), ALWAYS preserve:
+  - Current task checklist with completion status (done / in-progress / todo)
+  - Full list of files modified in this session
+  - Architectural decisions and their reasoning
+  - Active branch name, last commit hash, and uncommitted changes
+  - Test commands and expected results
+  - Any unresolved errors or blockers
+- Before compacting, ALWAYS update `CONTEXT.md` in the project root with the current session state.
+- Custom compact instruction: `/compact preserve task progress, modified files, architecture decisions, and CONTEXT.md contents`
+
+### Session Startup Recovery Protocol
+At the start of every new session or after compaction, execute this recovery sequence IN ORDER:
+1. Read `CLAUDE.md` (automatic)
+2. Read `CONTEXT.md` if it exists: `cat CONTEXT.md`
+3. Check recent git activity: `git log --oneline -15 && git diff --stat`
+4. Check current branch and status: `git branch --show-current && git status --short`
+5. Summarize recovered context to the user before proceeding
+
+### Session Checkpoint Protocol
+- Every 20-30 minutes or after completing a significant task, update `CONTEXT.md`.
+- Before ending a session, ALWAYS run: update `CONTEXT.md` with final state, then `git add CONTEXT.md && git commit -m "checkpoint: update session context"`
+- When switching between unrelated tasks, use `/clear` and start fresh rather than accumulating unrelated context.
+
+### CONTEXT.md Update Rules
+When updating CONTEXT.md, use the exact template format defined in the file. Include:
+- Current date/time
+- Active task and subtask status
+- Files modified (with brief description of changes)
+- Key decisions made and WHY
+- Known issues and blockers
+- Exact next steps to resume work
+
+### Subagent Usage
+- For research-heavy tasks (reading many files, auditing codebase, investigating dependencies), delegate to subagents to preserve main context.
+- Main session should only receive the summary, not the raw investigation data.
+
+### Context Budget Awareness
+- A 500-line TypeScript file ≈ 4,000 tokens
+- MCP tool definitions can consume 40-55K tokens — disable unused ones with `/mcp`
+- CLAUDE.md itself should stay under 4,000 words to avoid bloat
+- Use targeted reads (`Read file.ts:50-120`) instead of full file reads when possible
