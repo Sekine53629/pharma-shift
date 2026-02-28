@@ -77,3 +77,34 @@ class PrescriptionForecastViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsSupervisor]
     filterset_fields = ["store", "date", "model_version"]
     ordering_fields = ["date", "predicted_count"]
+
+    @action(detail=False, methods=["post"], permission_classes=[IsAdmin])
+    def generate(self, request):
+        """予測をオンデマンド生成（管理者専用）
+
+        Body: {"start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD"}
+        """
+        from datetime import datetime
+
+        from .services import generate_forecasts_lightgbm
+
+        start_str = request.data.get("start_date")
+        end_str = request.data.get("end_date")
+
+        if not start_str or not end_str:
+            return Response(
+                {"detail": "start_date と end_date を指定してください"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            start_date = datetime.strptime(start_str, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_str, "%Y-%m-%d").date()
+        except ValueError:
+            return Response(
+                {"detail": "日付形式は YYYY-MM-DD です"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        result = generate_forecasts_lightgbm(start_date, end_date)
+        return Response(result, status=status.HTTP_201_CREATED)

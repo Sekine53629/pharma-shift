@@ -181,3 +181,9 @@ CELERY_TIMEZONE = "Asia/Tokyo"
 ZOOM_ACCOUNT_ID = os.environ.get("ZOOM_ACCOUNT_ID", "")
 ZOOM_CLIENT_ID = os.environ.get("ZOOM_CLIENT_ID", "")
 ZOOM_CLIENT_SECRET = os.environ.get("ZOOM_CLIENT_SECRET", "")
+
+# Musubi Insight (scraping)
+
+MUSUBI_LOGIN_URL = os.environ.get("MUSUBI_LOGIN_URL", "")
+MUSUBI_USERNAME = os.environ.get("MUSUBI_USERNAME", "")
+MUSUBI_PASSWORD = os.environ.get("MUSUBI_PASSWORD", "")
