@@ -19,6 +19,17 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
     search_fields = ["staff__name"]
     ordering_fields = ["date", "created_at"]
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.has_any_role("admin", "supervisor"):
+            return qs
+        if user.has_role("store_manager") and hasattr(user, "staff_profile"):
+            return qs.filter(staff__store=user.staff_profile.store)
+        if user.has_role("rounder") and hasattr(user, "staff_profile"):
+            return qs.filter(staff=user.staff_profile)
+        return qs.none()
+
     @action(detail=True, methods=["post"])
     def review(self, request, pk=None):
         """休暇申請の承認/却下"""

@@ -29,6 +29,17 @@ class HrEvaluationViewSet(
     filterset_fields = ["evaluator", "rounder", "evaluation_type", "requires_approval"]
     ordering_fields = ["created_at", "score"]
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.has_any_role("admin", "supervisor"):
+            return qs
+        if user.has_role("store_manager") and hasattr(user, "staff_profile"):
+            return qs.filter(rounder__staff__store=user.staff_profile.store)
+        if user.has_role("rounder") and hasattr(user, "staff_profile"):
+            return qs.filter(rounder__staff=user.staff_profile)
+        return qs.none()
+
     @action(detail=True, methods=["post"])
     def add_comment(self, request, pk=None):
         """ラウンダー本人から異議申し立てコメントを登録
@@ -77,6 +88,17 @@ class HrPeriodSummaryViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsStoreManager]
     filterset_fields = ["rounder"]
     ordering_fields = ["period_start", "computed_hr"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.has_any_role("admin", "supervisor"):
+            return qs
+        if user.has_role("store_manager") and hasattr(user, "staff_profile"):
+            return qs.filter(rounder__staff__store=user.staff_profile.store)
+        if user.has_role("rounder") and hasattr(user, "staff_profile"):
+            return qs.filter(rounder__staff=user.staff_profile)
+        return qs.none()
 
     @action(detail=False, methods=["post"], permission_classes=[IsAdmin])
     def recalculate(self, request):

@@ -3,7 +3,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.accounts.permissions import IsSupervisor
+from apps.accounts.permissions import IsStoreManager, IsSupervisor
 
 from .models import Assignment, SupportSlot
 from .serializers import (
@@ -19,9 +19,18 @@ class SupportSlotViewSet(viewsets.ModelViewSet):
 
     queryset = SupportSlot.objects.select_related("store", "shift_period").all()
     serializer_class = SupportSlotSerializer
-    permission_classes = [IsSupervisor]
+    permission_classes = [IsStoreManager]
     filterset_fields = ["store", "shift_period", "priority", "is_filled", "date"]
     ordering_fields = ["priority", "date", "effective_difficulty_hr"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.has_any_role("admin", "supervisor"):
+            return qs
+        if user.has_role("store_manager") and hasattr(user, "staff_profile"):
+            return qs.filter(store=user.staff_profile.store)
+        return qs.none()
 
     @action(detail=True, methods=["post"])
     def generate_candidates(self, request, pk=None):
@@ -55,9 +64,20 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         "rounder__staff", "slot__store", "confirmed_by"
     ).all()
     serializer_class = AssignmentSerializer
-    permission_classes = [IsSupervisor]
+    permission_classes = [IsStoreManager]
     filterset_fields = ["rounder", "slot", "status"]
     ordering_fields = ["score", "created_at"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.has_any_role("admin", "supervisor"):
+            return qs
+        if user.has_role("store_manager") and hasattr(user, "staff_profile"):
+            return qs.filter(slot__store=user.staff_profile.store)
+        if user.has_role("rounder") and hasattr(user, "staff_profile"):
+            return qs.filter(rounder__staff=user.staff_profile)
+        return qs.none()
 
     @action(detail=True, methods=["post"])
     def confirm(self, request, pk=None):

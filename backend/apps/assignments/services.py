@@ -9,6 +9,14 @@ from apps.staff.models import Rounder, RounderStoreExperience
 from .models import Assignment, SupportSlot
 
 
+def is_same_area(rounder: Rounder, slot: SupportSlot) -> bool:
+    """ラウンダーの所属店舗と応援枠店舗が同一エリアかどうか"""
+    home_store = rounder.staff.store
+    if not home_store or not home_store.area or not slot.store.area:
+        return True  # area情報がない場合は同一エリア扱い
+    return home_store.area == slot.store.area
+
+
 def score_rounder(rounder: Rounder, slot: SupportSlot) -> Decimal:
     """候補者スコアリング（高いほど優先）"""
     score = Decimal("0")
@@ -36,6 +44,10 @@ def score_rounder(rounder: Rounder, slot: SupportSlot) -> Decimal:
     if slot.effective_difficulty_hr:
         margin = rounder.hunter_rank - slot.effective_difficulty_hr
         score += min(margin * 2, Decimal("20"))
+
+    # 同一エリアボーナス（近距離優先）
+    if is_same_area(rounder, slot):
+        score += 15
 
     return score
 
@@ -70,10 +82,9 @@ def check_assignment_prerequisites(rounder: Rounder, slot: SupportSlot) -> list[
     if slot.solo_hours > 0 and not rounder.can_work_alone:
         errors.append("一人薬剤師対応不可のラウンダーです")
 
-    # 長距離移動チェック（solo_hoursで簡易判定、将来的に距離ベースに変更）
-    if slot.store.area and not rounder.can_long_distance:
-        # 将来的に距離計算を入れる
-        pass
+    # 長距離移動チェック（エリア間移動を長距離と判定）
+    if not is_same_area(rounder, slot) and not rounder.can_long_distance:
+        errors.append("長距離移動不可のラウンダーですが、異なるエリアの店舗です")
 
     return errors
 
