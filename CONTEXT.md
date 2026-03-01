@@ -86,3 +86,29 @@ Uncommitted changes:
 ?? .claude/hooks/session-stop.sh
 ?? install-pyenv-win.ps1
 ```
+
+## Auto-checkpoint at Session End (2026-03-01 21:53)
+
+### Git State
+```
+Branch: main
+Last commit: 1bc0b80 auto-checkpoint: session end context save
+
+Uncommitted changes:
+ M .claude/settings.json
+ M .claude/settings.local.json
+ D "docs/~$\343\203\236\343\203\213\343\203\245\343\202\242\343\203\253_\343\202\267\343\203\225\343\203\210\350\252\277\346\225\264.docx"
+ M "docs/\346\245\255\345\213\231\343\203\236\343\203\213\343\203\245\343\202\242\343\203\253_\343\202\267\343\203\225\343\203\210\350\252\277\346\225\264.docx"
+ M notebooks/02_model_design_validation.ipynb
+ M notebooks/fig_10_architecture_comparison.png
+ M notebooks/fig_11_feature_importance.png
+ M notebooks/fig_12_quantile_forecast.png
+ M notebooks/fig_13_incremental_learning.png
+ M notebooks/fig_14_store_error_distribution.png
+?? .claude/hooks/post-edit.sh
+?? .claude/hooks/session-start.sh
+?? .claude/hooks/session-stop.sh
+?? install-pyenv-win.ps1
+?? notebooks/fig_09_overfitting_detection.png
+?? notebooks/fig_09b_rolling_cv.png
+```
