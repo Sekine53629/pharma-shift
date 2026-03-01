@@ -16,6 +16,8 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/assignments', label: 'Assignments', roles: ['admin', 'supervisor'] },
   { path: '/hr', label: 'HR System', roles: ['admin', 'supervisor', 'store_manager'] },
   { path: '/leave', label: 'Leave Requests' },
+  { path: '/staffing-check', label: 'Staffing Check', roles: ['admin', 'supervisor'] },
+  { path: '/buffer', label: 'Buffer Mgmt', roles: ['admin', 'supervisor', 'store_manager'] },
 ];
 
 const Sidebar: React.FC = () => {

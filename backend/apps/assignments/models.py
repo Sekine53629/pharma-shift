@@ -123,6 +123,8 @@ class Assignment(models.Model):
         CANDIDATE = "candidate", "候補"
         CONFIRMED = "confirmed", "確定"
         REJECTED = "rejected", "却下"
+        CANCELLED = "cancelled", "取消"
+        HANDED_OVER = "handed_over", "引継ぎ"
 
     rounder = models.ForeignKey(
         "staff.Rounder",
@@ -168,3 +170,59 @@ class Assignment(models.Model):
 
     def __str__(self):
         return f"{self.rounder.staff.name} → {self.slot}"
+
+
+class AssignmentLog(models.Model):
+    """アサイン証跡（INSERT-only）"""
+
+    assignment = models.ForeignKey(
+        Assignment,
+        on_delete=models.CASCADE,
+        related_name="logs",
+        verbose_name="アサイン",
+    )
+    from_status = models.CharField(
+        "変更前ステータス",
+        max_length=20,
+        blank=True,
+        default="",
+    )
+    to_status = models.CharField(
+        "変更後ステータス",
+        max_length=20,
+    )
+    changed_by = models.ForeignKey(
+        "staff.Staff",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assignment_log_actions",
+        verbose_name="操作者",
+    )
+    notification_log = models.ForeignKey(
+        "notifications.NotificationLog",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assignment_logs",
+        verbose_name="通知ログ",
+    )
+    notification_sent = models.BooleanField("通知送信済み", default=False)
+    created_at = models.DateTimeField("作成日時", auto_now_add=True)
+
+    class Meta:
+        db_table = "assignment_logs"
+        verbose_name = "アサイン証跡"
+        verbose_name_plural = "アサイン証跡"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.assignment} [{self.from_status}→{self.to_status}]"
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValueError("AssignmentLog is INSERT-only. Updates are not allowed.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValueError("AssignmentLog is INSERT-only. Deletion is not allowed.")

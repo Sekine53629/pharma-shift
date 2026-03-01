@@ -13,6 +13,7 @@ Note:
     本番環境では headless Chrome を使用する。
     pip install selenium
 """
+from __future__ import annotations
 
 import logging
 from datetime import date, timedelta

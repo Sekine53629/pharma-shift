@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import logging
+from typing import Optional
 
 import requests
 from django.conf import settings
@@ -8,7 +11,7 @@ from .models import NotificationLog
 logger = logging.getLogger(__name__)
 
 
-def get_zoom_access_token() -> str | None:
+def get_zoom_access_token() -> Optional[str]:
     """Zoom Server-to-Server OAuth2 でアクセストークンを取得"""
     if not all([settings.ZOOM_ACCOUNT_ID, settings.ZOOM_CLIENT_ID, settings.ZOOM_CLIENT_SECRET]):
         logger.warning("Zoom API credentials not configured")
@@ -74,7 +77,7 @@ def send_zoom_message(to_contact: str, message: str, trigger: str) -> Notificati
     return log
 
 
-def notify_store(store, message: str, trigger: str) -> NotificationLog | None:
+def notify_store(store, message: str, trigger: str) -> Optional[NotificationLog]:
     """店舗のZoomアカウントに通知"""
     if not store.zoom_account:
         logger.warning("Store %s has no Zoom account configured", store.name)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Assignment, SupportSlot
+from .models import Assignment, AssignmentLog, SupportSlot
 
 
 class SupportSlotSerializer(serializers.ModelSerializer):
@@ -50,6 +50,41 @@ class AssignmentSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "created_at", "score"]
+
+
+class AssignmentLogSerializer(serializers.ModelSerializer):
+    changed_by_name = serializers.CharField(
+        source="changed_by.name", read_only=True, default=""
+    )
+    from_status_display = serializers.SerializerMethodField()
+    to_status_display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AssignmentLog
+        fields = [
+            "id",
+            "assignment",
+            "from_status",
+            "from_status_display",
+            "to_status",
+            "to_status_display",
+            "changed_by",
+            "changed_by_name",
+            "notification_log",
+            "notification_sent",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+    def _status_display(self, value: str) -> str:
+        status_map = dict(Assignment.Status.choices)
+        return status_map.get(value, value)
+
+    def get_from_status_display(self, obj) -> str:
+        return self._status_display(obj.from_status)
+
+    def get_to_status_display(self, obj) -> str:
+        return self._status_display(obj.to_status)
 
 
 class GenerateCandidatesSerializer(serializers.Serializer):

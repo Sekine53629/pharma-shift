@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git pull:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "mcp__ide__executeCode",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(\"c:\\\\Users\\\\imao3\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\":*)",
+      "Bash(pyenv:*)",
+      "Bash(\"$USERPROFILE/.pyenv/pyenv-win/versions/3.12.8/python.exe\":*)",
+      "Bash(npm install:*)",
+      "Bash(npm start:*)",
+      "Bash(PYTHONIOENCODING=utf-8 \"$USERPROFILE/.pyenv/pyenv-win/versions/3.12.8/python.exe\":*)",
+      "Bash(sqlite3:*)",
+      "Bash(\"$HOME/.pyenv/pyenv-win/versions/3.12.8/python.exe\":*)",
+      "Bash(python3.12:*)",
+      "Bash(curl:*)",
+      "Bash(npx tsc:*)",
+      "Bash(C:/Users/imao3/.pyenv/pyenv-win/versions/3.12.8/python.exe:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(DJANGO_SETTINGS_MODULE=config.settings python:*)",
+      "Bash(test:*)",
+      "Bash(xargs:*)",
+      "Bash(iconv:*)",
+      "Bash(python3:*)"
+    ]
+  }
+}

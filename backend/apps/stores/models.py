@@ -28,6 +28,11 @@ class Store(models.Model):
         validators=[MinValueValidator(Decimal("1.0")), MaxValueValidator(Decimal("5.0"))],
     )
     slots = models.PositiveIntegerField("応援枠数", default=1)
+    min_pharmacists = models.PositiveIntegerField(
+        "必要最低薬剤師数",
+        default=1,
+        help_text="1日に必要な最低薬剤師数（平日基準）",
+    )
 
     # 初見殺しフラグ
     has_controlled_medical_device = models.BooleanField("高度管理医療機器", default=False)
@@ -38,6 +43,17 @@ class Store(models.Model):
     has_local_voucher = models.BooleanField("地方振興券対応", default=False)
     has_holiday_rules = models.BooleanField("祝日出勤特殊ルール", default=False)
 
+    monthly_working_days = models.PositiveIntegerField(
+        "月間所定労働日数",
+        null=True,
+        blank=True,
+        help_text="シフト期間あたりの所定労働日数（未設定時はスタッフの雇用形態から自動算出）",
+    )
+    operates_on_holidays = models.BooleanField(
+        "祝日営業",
+        default=False,
+        help_text="True の場合、祝日も通常営業として扱う",
+    )
     zoom_account = models.EmailField("Zoomアカウント", max_length=200, blank=True, default="")
     is_active = models.BooleanField("有効", default=True)
     created_at = models.DateTimeField("作成日時", auto_now_add=True)

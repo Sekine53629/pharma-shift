@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from decimal import Decimal
 
 from django.utils import timezone
 
 from apps.shifts.models import Shift
-from apps.staff.models import Rounder, RounderStoreExperience
+from apps.staff.models import Rounder, RounderStoreExperience, RounderUnavailability, Staff
 
-from .models import Assignment, SupportSlot
+from .models import Assignment, AssignmentLog, SupportSlot
 
 
 def is_same_area(rounder: Rounder, slot: SupportSlot) -> bool:
@@ -56,6 +58,12 @@ def check_assignment_prerequisites(rounder: Rounder, slot: SupportSlot) -> list[
     """アサイン前提条件チェック。違反がある場合はエラーメッセージのリストを返す。"""
     errors = []
 
+    # 応援不可期間チェック
+    if RounderUnavailability.objects.filter(
+        rounder=rounder, shift_period=slot.shift_period
+    ).exists():
+        errors.append(f"この期間（{slot.shift_period}）は応援不可に設定されています")
+
     # HR値チェック
     if slot.required_hr and rounder.hunter_rank < slot.required_hr:
         errors.append(
@@ -94,6 +102,7 @@ def generate_assignment_candidates(slot: SupportSlot, limit: int = 5) -> list[di
     rounders = Rounder.objects.filter(
         staff__is_active=True,
         staff__is_rounder=True,
+        staff__work_status=Staff.WorkStatus.ACTIVE,
     ).select_related("staff")
 
     candidates = []
@@ -110,3 +119,38 @@ def generate_assignment_candidates(slot: SupportSlot, limit: int = 5) -> list[di
 
     candidates.sort(key=lambda c: c["score"], reverse=True)
     return candidates[:limit]
+
+
+def create_assignment_log(
+    assignment: Assignment,
+    from_status: str,
+    to_status: str,
+    changed_by=None,
+    send_notification: bool = False,
+    notification_message: str = "",
+) -> AssignmentLog:
+    """ステータス変更時にアサイン証跡ログを作成する"""
+    notification_log = None
+    notification_sent = False
+
+    if send_notification and notification_message:
+        from apps.notifications.services import notify_store
+
+        store = assignment.slot.store
+        result = notify_store(
+            store,
+            notification_message,
+            trigger=f"assignment_{to_status}",
+        )
+        if result:
+            notification_log = result
+            notification_sent = result.is_sent
+
+    return AssignmentLog.objects.create(
+        assignment=assignment,
+        from_status=from_status,
+        to_status=to_status,
+        changed_by=changed_by,
+        notification_log=notification_log,
+        notification_sent=notification_sent,
+    )
