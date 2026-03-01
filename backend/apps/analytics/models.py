@@ -90,19 +90,26 @@ class WeatherRecord(models.Model):
 
 
 # Area → nearest JMA station mapping for 62 stores
+# Tuple: (station_name, prec_no, block_no)
+# block_no 5-digit = 官署 (daily_s1.php), 4-digit = AMeDAS (daily_a1.php)
 AREA_STATION_MAP = {
-    "旭川": ("旭川", "12", "47407"),
-    "名寄": ("名寄", "12", "47248"),
-    "稚内": ("稚内", "11", "47401"),
-    "留萌": ("留萌", "12", "47406"),
-    "北見・網走": ("北見", "13", "47440"),
-    "紋別": ("紋別", "13", "47430"),
-    "富良野": ("旭川", "12", "47407"),  # Furano uses Asahikawa station
-    "滝川・砂川": ("旭川", "12", "47407"),  # Uses Asahikawa station
-    "帯広": ("帯広", "14", "47417"),
-    "釧路": ("釧路", "14", "47418"),
-    "中標津": ("中標津", "14", "47420"),
+    "旭川":       ("旭川",   "12", "47407"),  # 官署
+    "名寄":       ("名寄",   "12", "0008"),   # AMeDAS
+    "稚内":       ("稚内",   "11", "47401"),  # 官署
+    "留萌":       ("留萌",   "13", "47406"),  # 官署
+    "北見・網走": ("北見",   "17", "0074"),   # AMeDAS
+    "紋別":       ("紋別",   "17", "47435"),  # 官署
+    "富良野":     ("富良野", "12", "0021"),   # AMeDAS (own station)
+    "滝川・砂川": ("滝川",   "15", "0041"),   # AMeDAS (own station)
+    "帯広":       ("帯広",   "20", "47417"),  # 官署
+    "釧路":       ("釧路",   "19", "47418"),  # 官署
+    "中標津":     ("中標津", "18", "0086"),   # AMeDAS
 }
+
+
+def is_amedas(block_no: str) -> bool:
+    """Return True if the block_no indicates an AMeDAS station (4-digit)."""
+    return len(block_no) <= 4
 
 
 class PrescriptionRecord(models.Model):

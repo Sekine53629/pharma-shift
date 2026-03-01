@@ -27,7 +27,14 @@
       "Bash(test:*)",
       "Bash(xargs:*)",
       "Bash(iconv:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(mv:*)",
+      "WebSearch",
+      "WebFetch(domain:www.jma.go.jp)",
+      "WebFetch(domain:kisho-tsuho.com)",
+      "WebFetch(domain:www.data.jma.go.jp)",
+      "WebFetch(domain:zenn.dev)",
+      "WebFetch(domain:kakehashi-dev.hatenablog.com)"
     ]
   }
 }

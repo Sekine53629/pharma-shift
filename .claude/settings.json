@@ -1,15 +1,34 @@
 {
   "hooks": {
-    "PreCompact": [
+    "PostToolUse": [
       {
-        "matcher": "",
-        "command": "bash .claude/hooks/pre-compact.sh"
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-edit.sh"
+          }
+        ]
       }
     ],
-    "PostCompact": [
+    "Stop": [
       {
-        "matcher": "",
-        "command": "bash .claude/hooks/post-compact.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-stop.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-start.sh"
+          }
+        ]
       }
     ]
   }

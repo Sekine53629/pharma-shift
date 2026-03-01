@@ -22,15 +22,18 @@ from apps.analytics.models import AREA_STATION_MAP, WeatherRecord
 
 # Station-level climate profiles (annual mean temp, winter low, summer high)
 # Based loosely on real JMA normals for Hokkaido.
+# Now includes 富良野 and 滝川 which have their own AMeDAS stations.
 STATION_PROFILES = {
-    "旭川": {"mean_temp": 6.5, "amp": 16.0, "precip_base": 3.0, "snow_factor": 1.0},
-    "名寄": {"mean_temp": 5.5, "amp": 17.0, "precip_base": 2.5, "snow_factor": 1.2},
-    "稚内": {"mean_temp": 6.0, "amp": 13.0, "precip_base": 3.5, "snow_factor": 0.9},
-    "留萌": {"mean_temp": 7.0, "amp": 14.0, "precip_base": 3.2, "snow_factor": 1.1},
-    "北見": {"mean_temp": 5.8, "amp": 17.0, "precip_base": 2.2, "snow_factor": 0.8},
-    "紋別": {"mean_temp": 5.5, "amp": 15.0, "precip_base": 2.8, "snow_factor": 0.9},
-    "帯広": {"mean_temp": 6.0, "amp": 17.5, "precip_base": 2.5, "snow_factor": 0.7},
-    "釧路": {"mean_temp": 5.5, "amp": 13.0, "precip_base": 3.0, "snow_factor": 0.5},
+    "旭川":   {"mean_temp": 6.5, "amp": 16.0, "precip_base": 3.0, "snow_factor": 1.0},
+    "名寄":   {"mean_temp": 5.5, "amp": 17.0, "precip_base": 2.5, "snow_factor": 1.2},
+    "稚内":   {"mean_temp": 6.0, "amp": 13.0, "precip_base": 3.5, "snow_factor": 0.9},
+    "留萌":   {"mean_temp": 7.0, "amp": 14.0, "precip_base": 3.2, "snow_factor": 1.1},
+    "北見":   {"mean_temp": 5.8, "amp": 17.0, "precip_base": 2.2, "snow_factor": 0.8},
+    "紋別":   {"mean_temp": 5.5, "amp": 15.0, "precip_base": 2.8, "snow_factor": 0.9},
+    "富良野": {"mean_temp": 6.0, "amp": 17.0, "precip_base": 3.0, "snow_factor": 1.1},
+    "滝川":   {"mean_temp": 6.8, "amp": 16.5, "precip_base": 3.0, "snow_factor": 1.0},
+    "帯広":   {"mean_temp": 6.0, "amp": 17.5, "precip_base": 2.5, "snow_factor": 0.7},
+    "釧路":   {"mean_temp": 5.5, "amp": 13.0, "precip_base": 3.0, "snow_factor": 0.5},
     "中標津": {"mean_temp": 4.5, "amp": 15.5, "precip_base": 2.8, "snow_factor": 0.6},
 }
 
